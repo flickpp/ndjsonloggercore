@@ -65,35 +65,35 @@ pub trait Outputter {
             if c == '"' {
                 self.write_str(&val[start..n], false);
                 self.write_str("\\\"", false);
-                start = n;
+                start = n + 1;
                 continue;
             }
 
             if c == '\\' {
                 self.write_str(&val[start..n], false);
                 self.write_str("\\\\", false);
-                start = n;
+                start = n + 1;
                 continue;
             }
 
             if c == '\n' {
                 self.write_str(&val[start..n], false);
                 self.write_str("\\n", false);
-                start = n;
+                start = n + 1;
                 continue;
             }
 
             if c == '\r' {
                 self.write_str(&val[start..n], false);
                 self.write_str("\\r", false);
-                start = n;
+                start = n + 1;
                 continue;
             }
 
             if c == '\t' {
                 self.write_str(&val[start..n], false);
                 self.write_str("\\t", false);
-                start = n;
+                start = n + 1;
                 continue;
             }
         }
@@ -106,7 +106,7 @@ pub trait Outputter {
     }
 
     fn write_json_key(&mut self, key: &str) {
-        self.write_str_with_escape(key);
+        self.write_json_string(key);
         self.write_str(":", false);
     }
 
@@ -125,7 +125,7 @@ pub trait Outputter {
     }
 
     fn write_json_end(&mut self) {
-        self.write_str("}\n", true);
+        self.write_str("}", true);
     }
 }
 
@@ -198,4 +198,118 @@ fn write_isotimestamp(outputter: &mut impl Outputter) {
 fn populate_buf_with_float(buf: &mut [u8; BUF_SIZE], _f: f64) -> &str {
     // TODO
     unsafe { core::str::from_utf8_unchecked(buf) }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    extern crate std;
+    use std::string::String;
+
+    use random_fast_rng::{FastRng, Random};
+
+    #[derive(Default)]
+    struct Output {
+        inner: String,
+        fin_count: usize,
+    }
+
+    impl Outputter for Output {
+        fn write_str(&mut self, val: &str, fin: bool) {
+            self.inner.push_str(val);
+            if fin {
+                self.fin_count += 1;
+            }
+        }
+    }
+
+    #[cfg(feature = "isotimestamp")]
+    #[test]
+    fn write_isotimestamp_() {
+        let mut out = Output::default();
+        write_isotimestamp(&mut out);
+        assert_eq!(&out.inner[..3], "ts:");
+    }
+
+    #[test]
+    fn outputter_() {
+        #[derive(serde::Deserialize, PartialEq, Eq, Debug)]
+        struct LogLine {
+            uint: u64,
+            iint: i64,
+            t: bool,
+            f: bool,
+            empty_string: String,
+            single_quote: String,
+            single_newline: String,
+            tab_indent: String,
+            multi_line: String,
+        }
+
+        let mut rng = FastRng::new();
+        let uint = rng.gen::<u64>();
+        let iint = rng.gen::<i64>();
+        let empty_string = String::new();
+        let single_quote = String::from("\"");
+        let single_newline = String::from("\n");
+        let multi_line = String::from("\thello\r\n\tMy name is Bob\r\n\t\"boo\"\r\n\tend");
+        let tab_indent = String::from("\thello world");
+        let mut out = Output::default();
+        let mut buf = [0_u8; BUF_SIZE];
+
+        out.write_json_val("{");
+
+        // uint and iint
+        out.write_json_key("uint");
+        out.write_str(utoa_base10(&mut buf, uint), false);
+        out.write_json_val(",");
+        out.write_json_key("iint");
+        out.write_str(itoa_base10(&mut buf, iint), false);
+        out.write_json_val(",");
+
+        // t and f
+        out.write_json_key("t");
+        out.write_json_bool(true);
+        out.write_json_val(",");
+        out.write_json_key("f");
+        out.write_json_bool(false);
+        out.write_json_val(",");
+
+        // Strings
+        out.write_json_key("empty_string");
+        out.write_json_string(&empty_string);
+        out.write_json_val(",");
+        out.write_json_key("single_quote");
+        out.write_json_string(&single_quote);
+        out.write_json_val(",");
+        out.write_json_key("single_newline");
+        out.write_json_string(&single_newline);
+        out.write_json_val(",");
+        out.write_json_key("tab_indent");
+        out.write_json_string(&tab_indent);
+        out.write_json_val(",");
+        out.write_json_key("multi_line");
+        out.write_json_string(&multi_line);
+
+        out.write_json_end();
+
+        let log_line: LogLine =
+            serde_json::from_str(&out.inner).expect("couldn't deserialize logline, invalid json");
+
+        assert_eq!(
+            log_line,
+            LogLine {
+                uint,
+                iint,
+                f: false,
+                t: true,
+                empty_string,
+                single_quote,
+                single_newline,
+                tab_indent,
+                multi_line,
+            }
+        );
+    }
 }

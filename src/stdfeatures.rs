@@ -13,7 +13,7 @@ impl crate::Outputter for StdoutOutputter {
         self.buf.push_str(val);
 
         if fin {
-            print!("{}", self.buf);
+            println!("{}", self.buf);
             self.buf.clear();
         }
     }
@@ -26,7 +26,7 @@ impl StdoutOutputter {
 }
 
 thread_local! {
-    static STDOUT_LOGGER: RefCell<StdoutOutputter> = RefCell::new(StdoutOutputter::default());
+    static STDOUT_LOGGER: RefCell<StdoutOutputter> = RefCell::new(StdoutOutputter::new());
 }
 
 pub fn simple_log(msg: &str, level: crate::Level, entries: &[crate::Entry<'_, '_>]) {

@@ -8,7 +8,12 @@ edition = "2021"
 [dependencies]
 chrono = {version = "0.4.19", optional = true}
 
+[dev-dependencies]
+serde = {version = "1.0.139", features = ["derive"]}
+serde_json = "1.0.82"
+random-fast-rng = "0.1.1"
+
 [features]
-default = ["std", "isotimestamp"]
+default = []
 std = []
 isotimestamp = ["std", "dep:chrono"]

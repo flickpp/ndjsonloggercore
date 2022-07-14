@@ -16,22 +16,24 @@ ndjsonlogger = {version = "0.1", features = ["std"]}
 use ndjsonloggercore::{log, level, Entry. Value, Atom, StdoutOutputter};
 
 fn main() {
-	// StdoutOutputter requires `std` crate feature.
-	let mut outputter = StdoutOutputter::new();
+    // StdoutOutputter requires `std` crate feature.
+    let mut outputter = StdoutOutputter::new();
 
-	log(None, &mut outputter, "service started", level::Info, &[]);
-	
-	let my_num: u64 = 15;
-	log(None, &mut outputter, "a log line", level::Error, &[
-		Entry{ key: "key1", value: Value::Atom(Atom::String("value1")) },
-		Entry{ key: "key2", value: Value::Atom(Atom::Uint(my_num)) },
-	]);
+    log(None, &mut outputter, "service started", level::Info, &[]);
+
+    let my_num: u64 = 15;
+    let healthy = true;
+    log(None, &mut outputter, "a log line", level::Error, &[
+        Entry{ key: "key1", value: Value::Atom(Atom::String("value1")) },
+        Entry{ key: "key2", value: Value::Atom(Atom::Uint(my_num)) },
+        Entry{ key: "healthy", value: Value::Atom(Atom::Bool(healthy)) },
+    ]);
 }
 ```
 
 ```json
 {"level": "info", "msg": "service started"}
-{"level": "error", "msg": "a log line", "key1": "value1", "key2": 15}
+{"level": "error", "msg": "a log line", "key1": "value1", "key2": 15, "healthy": true}
 ```
 
 ## Features
