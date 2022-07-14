@@ -25,35 +25,12 @@ impl StdoutOutputter {
     }
 }
 
-pub struct ServiceLogger {
-    service_name: Option<&'static str>,
-}
-
-impl ServiceLogger {
-    pub fn new(service_name: Option<&'static str>) -> Self {
-        Self { service_name }
-    }
-
-    #[inline(always)]
-    pub fn log(
-        &self,
-        outputter: &mut impl crate::Outputter,
-        msg: &str,
-        level: crate::Level,
-        entries: &[crate::Entry<'_, '_>],
-    ) {
-        crate::log(self.service_name, outputter, msg, level, entries)
-    }
-}
-
-const LOGGER: ServiceLogger = ServiceLogger { service_name: None };
-
 thread_local! {
     static STDOUT_LOGGER: RefCell<StdoutOutputter> = RefCell::new(StdoutOutputter::default());
 }
 
 pub fn simple_log(msg: &str, level: crate::Level, entries: &[crate::Entry<'_, '_>]) {
     STDOUT_LOGGER.with(|out| {
-        LOGGER.log(&mut *(out.borrow_mut()), msg, level, entries);
+        crate::log(None, &mut *(out.borrow_mut()), msg, level, entries);
     });
 }
