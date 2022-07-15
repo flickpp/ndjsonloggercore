@@ -19,15 +19,17 @@ fn main() {
     // StdoutOutputter requires `std` crate feature.
     let mut outputter = StdoutOutputter::new();
 
-    log(None, &mut outputter, "service started", level::Info, &[]);
+    log(None, &mut outputter, "service started", level::Info, [].into_iter());
 
     let my_num: u64 = 15;
     let healthy = true;
-    log(None, &mut outputter, "a log line", level::Error, &[
+    log(None, &mut outputter, "a log line", level::Error, [
         Entry{ key: "key1", value: Value::Atom(Atom::String("value1")) },
         Entry{ key: "key2", value: Value::Atom(Atom::Uint(my_num)) },
         Entry{ key: "healthy", value: Value::Atom(Atom::Bool(healthy)) },
-    ]);
+    ]
+    .into_iter(),
+	);
 }
 ```
 
