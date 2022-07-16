@@ -29,7 +29,7 @@ thread_local! {
     static STDOUT_LOGGER: RefCell<StdoutOutputter> = RefCell::new(StdoutOutputter::new());
 }
 
-pub fn simple_log<'s>(
+pub fn stdout_log<'s>(
     msg: &str,
     level: crate::Level,
     entries: impl Iterator<Item = crate::Entry<'s, 's>>,

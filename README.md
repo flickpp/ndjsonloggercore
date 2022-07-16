@@ -51,7 +51,7 @@ ndjosnloggercore = {version = "0.1", features = ["isotimestamp", "std"]}
 ```
 
 ```json
-{"level": "info", "ts": "2022-07-13T16:47:36.429838", "msg": "example message"}
+{"level": "info", "ts": "2022-07-13T16:47:36.429838Z", "msg": "example message"}
 ```
 
 ## Contributing

@@ -230,7 +230,7 @@ pub fn log<'s>(
 fn write_isotimestamp(outputter: &mut impl Outputter) {
     use chrono::prelude::*;
 
-    let ts = Utc::now().to_rfc3339_opts(SecondsFormat::Millis, false);
+    let ts = Utc::now().to_rfc3339_opts(SecondsFormat::Micros, true);
 
     outputter.write_json_key("ts");
     outputter.write_json_string(&ts);

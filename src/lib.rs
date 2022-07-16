@@ -9,4 +9,4 @@ mod conv;
 #[cfg(feature = "std")]
 mod stdfeatures;
 #[cfg(feature = "std")]
-pub use stdfeatures::{simple_log, StdoutOutputter};
+pub use stdfeatures::{stdout_log, StdoutOutputter};
