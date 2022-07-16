@@ -1,4 +1,4 @@
-use crate::conv::{itoa_base10, utoa_base10};
+use crate::conv::{f64_to_str, itoa_base10, utoa_base10};
 
 const BUF_SIZE: usize = 24;
 
@@ -13,10 +13,7 @@ pub enum Atom<'a> {
 impl<'a> Atom<'a> {
     fn write_value(&self, outputter: &mut impl Outputter, buf: &mut [u8; BUF_SIZE]) {
         match self {
-            Atom::Float(f) => {
-                let s = populate_buf_with_float(buf, *f);
-                outputter.write_str(s);
-            }
+            Atom::Float(f) => outputter.write_str(f64_to_str(buf, *f)),
             Atom::Int(i) => outputter.write_str(itoa_base10(buf, *i)),
             Atom::Uint(u) => outputter.write_str(utoa_base10(buf, *u)),
             Atom::String(s) => outputter.write_json_string(s),
@@ -187,15 +184,13 @@ pub fn log<'s>(
         match e.value {
             Value::Atom(ref a) => a.write_value(outputter, &mut buf),
             Value::Array(ref mut arr) => {
-                let mut n = 0;
                 outputter.write_json_start_array();
-                while let Some(a) = arr.next() {
+                for (n, a) in arr.by_ref().enumerate() {
                     if n != 0 {
                         outputter.write_json_comma();
                     }
 
                     a.write_value(outputter, &mut buf);
-                    n += 1;
                 }
                 outputter.write_json_end_array();
             }
@@ -205,15 +200,13 @@ pub fn log<'s>(
             },
             Value::Optarray(ref mut oarr) => match oarr {
                 Some(ref mut arr) => {
-                    let mut n = 0;
                     outputter.write_json_start_array();
-                    while let Some(a) = arr.next() {
+                    for (n, a) in arr.by_ref().enumerate() {
                         if n != 0 {
                             outputter.write_json_comma();
                         }
 
                         a.write_value(outputter, &mut buf);
-                        n += 1;
                     }
                     outputter.write_json_end_array();
                 }
@@ -235,11 +228,6 @@ fn write_isotimestamp(outputter: &mut impl Outputter) {
     outputter.write_json_key("ts");
     outputter.write_json_string(&ts);
     outputter.write_json_comma();
-}
-
-fn populate_buf_with_float(buf: &mut [u8; BUF_SIZE], _f: f64) -> &str {
-    // TODO
-    unsafe { core::str::from_utf8_unchecked(buf) }
 }
 
 #[cfg(test)]

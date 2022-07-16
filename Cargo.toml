@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 chrono = {version = "0.4.19", optional = true}
+ryu = "1.0.10"
 
 [dev-dependencies]
 serde = {version = "1.0.139", features = ["derive"]}
