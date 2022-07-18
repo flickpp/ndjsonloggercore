@@ -2,6 +2,12 @@
 name = "ndjsonloggercore"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "ndjsonloggercore"
+homepage = "https://github.com/flickpp/ndjsonlogger"
+repository = "https://github.com/flickpp/ndjsonloggercore"
+readme = "README.md"
+keywords = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
