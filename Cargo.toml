@@ -12,7 +12,7 @@ keywords = []
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = {version = "0.4.19", optional = true}
+chrono = {version = "0.4.19"}
 ryu = "1.0.10"
 
 [dev-dependencies]
@@ -23,4 +23,4 @@ random-fast-rng = "0.1.1"
 [features]
 default = []
 std = []
-isotimestamp = ["std", "dep:chrono"]
+isotimestamp = ["std"]
