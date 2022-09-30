@@ -32,7 +32,7 @@ thread_local! {
 pub fn stdout_log<'s>(
     msg: &str,
     level: crate::Level,
-    entries: impl Iterator<Item = crate::Entry<'s, 's>>,
+    entries: impl Iterator<Item = crate::Entry<'s, 's, 's>>,
 ) {
     STDOUT_LOGGER.with(|out| {
         crate::log(None, &mut *(out.borrow_mut()), msg, level, entries);

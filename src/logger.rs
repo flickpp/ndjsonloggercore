@@ -29,8 +29,8 @@ pub enum Value<'s, 'a> {
     Optarray(Option<&'s mut dyn Iterator<Item = Atom<'a>>>),
 }
 
-pub struct Entry<'s, 'a> {
-    pub key: &'static str,
+pub struct Entry<'k, 's, 'a> {
+    pub key: &'k str,
     pub value: Value<'s, 'a>,
 }
 
@@ -150,7 +150,7 @@ pub fn log<'s>(
     outputter: &mut impl Outputter,
     msg: &str,
     level: Level,
-    entries: impl Iterator<Item = Entry<'s, 's>>,
+    entries: impl Iterator<Item = Entry<'s, 's, 's>>,
 ) {
     outputter.write_json_start();
     if let Some(service_name) = service_name {
